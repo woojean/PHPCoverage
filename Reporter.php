@@ -113,9 +113,7 @@ foreach ($keywords as $key => $value) {
 	$html=str_replace($value.'&nbsp;','<label class="keyword">'.$value.'&nbsp;</label>', $html);
 }
 
-var_dump($allLines);
-var_dump($excutableLines);
-var_dump($coverLines);
+
 echo $html;
 
 

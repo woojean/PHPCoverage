@@ -1,0 +1,22 @@
+{
+    "name": "woojean/PHPCoverage",
+    "description": "php code coverage",
+    "license": "MIT",
+    "keywords": ["coverage code php"],
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "woojean",
+            "email": "168056828@qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0"
+    },
+ 
+    "autoload": {
+        "psr-0": {
+            "Woojean\\PHPCoverage": "src/"
+        }
+    }
+}

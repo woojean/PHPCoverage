@@ -1,10 +1,9 @@
 <?php 
 
-require 'Injecter.php';
-
-PHPCoverage_Inject([
-	'log_dir'=>'/vagrant/logs/PHPCoverage',
-	'ignore_file'=>'/vagrant/www/github/PHPCoverage/ignores/example.ignore',
+require_once '/Users/wujian/github/PHPCoverage/src/Woojean/PHPCoverage/PHPCoverageInjecter.php';
+Woojean\PHPCoverage\PHPCoverageInjecter::Inject([
+	'log_dir'=>'/Users/wujian/work/logs/PHPCoverage',
+	'ignore_file'=>'/Users/wujian/github/PHPCoverage/demo/example.ignore',
 	'is_repeat' => true 
 ]);
 

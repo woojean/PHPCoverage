@@ -3,7 +3,7 @@ PHPCoverage是一款基于xdebug实现的PHP代码覆盖率统计工具，可以
 
 
 ### 使用
-PHPCoverage的使用非常简单，在下载了PHPCoverage的项目代码至本地后，只需在项目的主入口处引用插桩文件，并添加插桩代码即可。
+PHPCoverage的使用非常简单，在下载了PHPCoverage的项目代码至本地后，只需在项目的主入口处（通常是项目的index.php文件的开头处）引用插桩文件，并添加插桩代码即可。
 
 ##### 插桩代码的示例如下：
 ```javascript

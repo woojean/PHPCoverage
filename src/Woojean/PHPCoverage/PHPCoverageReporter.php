@@ -1,86 +1,5 @@
 <?php
-// @author woojean
-// https://github.com/woojean/PHPCoverage
-
-
-// $logDir 覆盖率日志目录
-// $ignoreFiles 需要忽略的目录、文件列表
-// $repeat 是否累加测试（累加测试期间，代码文件不应该变动，否则影响覆盖率行的判断）
-function PHPCoverage_Inject($config=[]){
-	$logDir = isset($config['log_dir']) ? $config['log_dir'] : '';
-	$ignoreFile = isset($config['ignore_file']) ? $config['ignore_file'] : '';
-	$isRepeat = isset($config['is_repeat']) ? $config['is_repeat'] : False;
-
-	if(!is_writable($logDir)){
-		echo ('PHPCoverage config error ：log dir "<u>'.$logDir.'</u>" can not be null and must be writable !');
-		exit(0);
-	}
-
-	if(!empty($ignoreFile) && !file_exists($ignoreFile)){
-		echo ('PHPCoverage config error ：ignore file "<u>'.$ignoreFile.'</u>" is not exists !');
-		
-	}
-
-	if(!$isRepeat){
-		PHPCoverage_ClearDir($config['log_dir']);
-	}
-
-	if (function_exists('xdebug_start_code_coverage')) {
-		xdebug_start_code_coverage();
-		register_shutdown_function('PHPCoverage_Gather',$logDir,$ignoreFile);
-	}
-	else{
-		echo ('PHPCoverage config error ：xdebug unreachable !');
-		exit(0);
-	}
-}
-
-
-function PHPCoverage_Gather($logDir,$ignoreFile){
-	$coverageData = xdebug_get_code_coverage();
-	xdebug_stop_code_coverage();
-	$coverageFile = sprintf('%s/%s.coverage', $logDir, uniqid());
-	file_put_contents($coverageFile,json_encode($coverageData));
-	PHPCoverage_Reporter($logDir,$ignoreFile);
-}
-
-function PHPCoverage_Reporter($logDir,$ignoreFile){
-	$reporter = new PHPCoverageReporter($logDir,$ignoreFile);
-	$reporter->report();
-}
-
-
-function PHPCoverage_ClearDir($dir) {
-  	$dh = opendir($dir);
-  	while ($file=readdir($dh)) {
-    	if($file!="." && $file!="..") {
-	      	$fullpath=$dir."/".$file;
-	      	if(!is_dir($fullpath)) {
-	          	unlink($fullpath);
-	      	} else {
-	          	PHPCoverage_ClearDir($fullpath);
-	      	}
-    	}
-  	}
-  	closedir($dh);
-}
-
-
-function PHPCoverage_GetPhpCode($src) {
-  	$dh = opendir($dir);
-  	while ($file=readdir($dh)) {
-    	if($file!="." && $file!="..") {
-	      	$fullpath=$dir."/".$file;
-	      	var_dump($fullpath);
-	      	if(!is_dir($fullpath)) {
-	          	unlink($fullpath);
-	      	} else {
-	          	PHPCoverage_ClearDir($fullpath);
-	      	}
-    	}
-  	}
-  	closedir($dh);
-}
+namespace Woojean\PHPCoverage;
 
 class PHPCoverageReporter{
 	private $logDir = '';
@@ -162,7 +81,7 @@ class PHPCoverageReporter{
 			$sumExcutable += intval($ret['lines_excutable']);
 			$sumCovered += intval($ret['lines_covered']);
 		}
-		$sumCoverRate = strval(($sumCovered/$sumExcutable)*100).'%';
+		$sumCoverRate = strval(round(($sumCovered/$sumExcutable),4)*100).'%';
 
 		$html = str_replace('%FILE_ITEMS%', $items, $html);
 

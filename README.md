@@ -6,7 +6,11 @@ PHPCoverage是一款基于xdebug实现的PHP代码覆盖率统计工具，可以
 PHPCoverage的使用非常简单，在下载了PHPCoverage的项目代码至本地后，只需在项目的主入口处（通常是项目的index.php文件的开头处）引用插桩文件，并添加插桩代码即可。
 
 ##### 插桩代码的示例如下：
+index.php
+
 ```javascript
+<?php
+
 // 引入插桩文件，例如我的本地PHPCoverage项目位置在：/vagrant/github/PHPCoverage
 require '/vagrant/github/PHPCoverage/Injecter.php';
 
@@ -16,6 +20,8 @@ PHPCoverage_Inject([
     'ignore_file'=>'/vagrant/github/PHPCoverage/ignores/example.ignore',
     'is_repeat' => true 
 ]);
+
+// ...
 ```
 
 ##### 参数说明：

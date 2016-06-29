@@ -11,14 +11,14 @@ PHPCoverage的使用非常简单，在下载了PHPCoverage的项目代码至本�
 ```javascript
 <?php
 
-// 引入插桩文件，例如我的本地PHPCoverage项目位置在：/vagrant/github/PHPCoverage
-require '/vagrant/github/PHPCoverage/Injecter.php';
+// 引入插桩文件，例如我的本地PHPCoverage项目位置在：/vagrant/PHPCoverage处，则如下引用
+require_once '/vagrant/PHPCoverage/src/Woojean/PHPCoverage/Injecter.php';
 
 // 插桩
-PHPCoverage_Inject([
-    'log_dir'=>'/vagrant/logs/PHPCoverage',
-    'ignore_file'=>'/vagrant/github/PHPCoverage/ignores/example.ignore',
-    'is_repeat' => true 
+Woojean\PHPCoverage\Injecter::Inject([
+	'log_dir'=>'/vagrant/logs',
+	'ignore_file'=>'/vagrant/PHPCoverage/demo/example.ignore',
+	'is_repeat' => true 
 ]);
 
 // ...
@@ -30,7 +30,15 @@ log_dir应该是一个PHP具有写权限的目录的路径（绝对路径），`
 
 ###### ignore_file
 ignore_file`用于指定需要忽略掉的文件`，比如第三方的代码、框架文件以及其他不想关注的文件。
-该文件`使用PHP数组描述`，在PHPCoverage项目的ignores文件夹中包含一个示例文件example.ignore
+该文件`使用PHP数组描述`，在PHPCoverage项目的ignores文件夹中包含一个示例文件example.ignore，内容如下：
+```
+<?php
+
+return [
+	"/vagrant/www/cbd_wechat/vendor",
+	"/vagrant/www/cbd_wechat/library"
+];
+```
 
 ###### is_repeat
 is_repeat可以指定为ture或false，用于控制是否进行`叠加测试`。
@@ -78,14 +86,28 @@ is_repeat可以指定为ture或false，用于控制是否进行`叠加测试`。
 
  ![image](https://github.com/woojean/PHPCoverage/raw/master/imgs/colored.jpg)
 
-## 使用
-### 使用Composer安装使用
+
+### 通过Composer安装使用
 
 ##### Composer包名：
 `woojean/php-coverage`
 
+##### 插桩代码的示例如下：
+`index.php`
 
+```javascript
+<?php
 
+// 插桩
+Woojean\PHPCoverage\Injecter::Inject([
+	'log_dir'=>'/vagrant/logs',
+	'ignore_file'=>'/vagrant/PHPCoverage/demo/example.ignore',
+	'is_repeat' => true 
+]);
+
+// ...
+```
+参数配置及说明见上文。
 
 
 

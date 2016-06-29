@@ -106,7 +106,7 @@ class Reporter{
 
 		$coverIndex = array_keys($lines);
 		$src = file_get_contents($srcPath);
-		$arr = split(PHP_EOL, $src);
+		$arr = explode(PHP_EOL, $src);
 
 		$html = $this->TEMPLATE_FILR_REPORT;
 		$allLines = count($arr)-2;
@@ -150,7 +150,13 @@ class Reporter{
 		$result['lines_all'] = $allLines;
 		$result['lines_excutable'] = $excutableLines;
 		$result['lines_covered'] = $coverLines;
-		$result['coverage_rate'] = round(floatval($coverLines)/floatval($excutableLines) ,2);
+		if(intval($excutableLines)>0){
+			$result['coverage_rate'] = round(floatval($coverLines)/floatval($excutableLines) ,2);
+		}
+		else{
+			$result['coverage_rate'] = '0';
+		}
+		
 		return $result;
 	}
 

@@ -1,10 +1,9 @@
 <?php 
 
-require 'Injecter.php';
-
-PHPCoverage_Inject([
+require_once '/vagrant/www/github/PHPCoverage/src/Woojean/PHPCoverage/Injecter.php';
+Woojean\PHPCoverage\Injecter::Inject([
 	'log_dir'=>'/vagrant/logs/PHPCoverage',
-	'ignore_file'=>'/vagrant/www/github/PHPCoverage/ignores/example.ignore',
+	'ignore_file'=>'/vagrant/www/github/PHPCoverage/demo/example.ignore',
 	'is_repeat' => true 
 ]);
 
@@ -71,7 +70,7 @@ $b = [
 ];
 
 $c = $a+$b;
-var_dump(array_keys($c));
 
-//var_dump(array_unique(array_merge(array_keys($a),array_keys($b))));
+echo $c;
+
 

@@ -43,25 +43,39 @@ is_repeat可以指定为ture或false，用于控制是否进行`叠加测试`。
 
 ##### 报告说明：
 当测试结束后，会在插桩时指定的log_dir目录下生成覆盖率统计文件和报告文件，其中index.html文件为报告的入口文件：
+
  ![image](https://github.com/woojean/PHPCoverage/raw/master/imgs/files.jpg)
 
 打开index.html文件后，内容如下：
+
  ![image](https://github.com/woojean/PHPCoverage/raw/master/imgs/reporter.jpg)
 
+
 文件顶部为本次测试的总体统计信息：
+
  ![image](https://github.com/woojean/PHPCoverage/raw/master/imgs/sum.jpg)
 
+
+
 文件左侧为本次测试覆盖到的所有文件的列表（不含在ignore_file忽略的文件），点击文件列表中的任意文件，将在右侧展示该文件的覆盖情况。
+
 其中灰色的行为不可执行代码：
+
  ![image](https://github.com/woojean/PHPCoverage/raw/master/imgs/unexec.jpg)
 
+
 其中淡黄色的行为可执行代码但未覆盖的代码：
- ![image](https://github.com/woojean/PHPCoverage/raw/master/imgs/uncover.jpg)
+
+ ![image](https://github.com/woojean/PHPCoverage/raw/master/imgs/uncove.jpg)
+
 
 绿色的行为被覆盖的可执行代码：
+
  ![image](https://github.com/woojean/PHPCoverage/raw/master/imgs/covered.jpg)
 
+
 同时，在左侧文件列表中，针对不同的代码覆盖程度，也给出了不同颜色区分的标记：
+
  ![image](https://github.com/woojean/PHPCoverage/raw/master/imgs/colored.jpg)
 
 ## 使用

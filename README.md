@@ -1,4 +1,5 @@
-﻿# PHPCoverage (简洁易用的PHP代码覆盖率统计工具)
+﻿# PHPCoverage 说明文档
+PHPCoverage是一款基于xdebug实现的简洁易用的PHP代码覆盖率统计工具)
 
 ## 使用
 ### 使用Composer安装使用

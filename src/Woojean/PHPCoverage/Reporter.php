@@ -234,6 +234,7 @@ class Reporter{
 
 		html,body{
 			height: 100%;
+			font-size:0.8em;
             font-family: "Microsoft YaHei" ! important;
 		}
 		
@@ -344,7 +345,7 @@ class Reporter{
 		.container{
             position:fixed;
             left:30%;
-            width: 70%;
+            width:70%;
             top:30px;
 			height:100%;
 		}
@@ -391,6 +392,16 @@ class Reporter{
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style>
+html,body,div,span,iframe{
+	margin: 0;
+	padding: 0;
+}
+
+html,body{
+	height: 100%;
+	font-family: "Microsoft YaHei" ! important;
+}
+
 .e{
 	background-color:#F0F0F0;
 }
@@ -409,6 +420,10 @@ class Reporter{
 }
 
 .line_num{
+	font-size:0.8em;
+}
+
+table {
 	font-size:0.8em;
 }
 

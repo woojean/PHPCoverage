@@ -1,16 +1,15 @@
 <?php 
 
-require_once '/vagrant/www/github/PHPCoverage/src/Woojean/PHPCoverage/Injecter.php';
+/*require_once '/vagrant/www/github/PHPCoverage/src/Woojean/PHPCoverage/Injecter.php';
 Woojean\PHPCoverage\Injecter::Inject([
 	'log_dir'=>'/vagrant/logs/PHPCoverage',
 	'ignore_file'=>'/vagrant/www/github/PHPCoverage/demo/example.ignore',
 	'is_repeat' => true 
-]);
+]);*/
 
-/*
-$reporter = new PHPCoverageReporter('/vagrant/logs/PHPCoverage','/vagrant/www/github/PHPCoverage/ignores/example.ignore',true);
+require_once '/vagrant/www/github/PHPCoverage/src/Woojean/PHPCoverage/Reporter.php';
+$reporter = new Woojean\PHPCoverage\Reporter('/vagrant/logs/PHPCoverage','/vagrant/www/github/PHPCoverage/demo/example.ignore',true);
 $reporter->report();
-*/
 
 class A{
 	private $_a = 0;

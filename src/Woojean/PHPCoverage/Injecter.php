@@ -1,6 +1,8 @@
 <?php
 namespace Woojean\PHPCoverage;
 
+use Redis;
+
 class Injecter{
 	public static $callback;
 
@@ -28,7 +30,8 @@ class Injecter{
 
 		if (function_exists('xdebug_start_code_coverage')) {
 			xdebug_start_code_coverage();
-			register_shutdown_function("Woojean\\PHPCoverage\\Injecter::Gather",$logDir,$ignoreFile);
+			register_shutdown_function("Woojean\\PHPCoverage\\Injecter::GatherUsingRedis",$logDir,$ignoreFile);
+            #register_shutdown_function("Woojean\\PHPCoverage\\Injecter::Gather",$logDir,$ignoreFile);
 		}
 		else{
 			echo ('PHPCoverage config error ：xdebug unreachable !');
@@ -44,6 +47,22 @@ class Injecter{
 		file_put_contents($coverageFile,json_encode($coverageData));
 		self::Reporter($logDir,$ignoreFile);
 	}
+
+    public static function GatherUsingRedis($logDir,$ignoreFile){
+        $coverageData = xdebug_get_code_coverage();
+        xdebug_stop_code_coverage();
+        $redis = new Redis();
+        $redis->connect('127.0.0.1', 6379);
+        echo "Connection to server successfully...\n";
+        foreach ($coverageData as $fileName => $fileData){
+            foreach ($fileData as $line => $status){
+                if($status == 1){
+                    $redis->sAdd($fileName,$line);
+                }
+            }
+        }
+        self::Reporter($logDir,$ignoreFile);
+    }
 
 	private static function Reporter($logDir,$ignoreFile){
 		require_once 'Reporter.php'; // !

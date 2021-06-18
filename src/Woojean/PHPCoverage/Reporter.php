@@ -1,6 +1,8 @@
 <?php
 namespace Woojean\PHPCoverage;
 
+use Redis;
+
 class Reporter{
 	private $logDir = '';
 	private $ignoreFile = '';
@@ -24,7 +26,8 @@ class Reporter{
 	
 
 	public function report(){
-		$allCoverageData = $this->mergeCoverages();
+		#$allCoverageData = $this->mergeCoverages();
+        $allCoverageData = $this->mergeCoveragesUsingRedis();
 		
 		$html = $this->TEMPLATE_REPORT;
 		$items = '';
@@ -201,6 +204,23 @@ class Reporter{
 		}
 		return $allCoverageData;
 	}
+
+    protected function mergeCoveragesUsingRedis(){
+        $allCoverageData = [];
+        $redis = new Redis();
+        $redis->connect('127.0.0.1', 6379);
+        echo "Connection to server successfully...\n";
+        $fileNames = $redis->keys("*.php");
+        foreach ($fileNames as $filename){
+            $lines = $redis->sMembers($filename);
+            $tmp = [];
+            foreach ($lines as $lineNo){
+                $tmp[$lineNo] = 1;
+            }
+            $allCoverageData[$filename] = $tmp;
+        }
+        return $allCoverageData;
+    }
 
 	protected function getCoverageFiles(){
 		$files = [];

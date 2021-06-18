@@ -111,7 +111,7 @@ Woojean\PHPCoverage\Injecter::Inject([
 
 
 
-#统计web服务的代码覆盖率(使用auto_prepend_file)
+# 统计web服务的代码覆盖率(使用auto_prepend_file)
 
 * 配置php.ini
   xdebug.mode = coverage

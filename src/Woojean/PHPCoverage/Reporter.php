@@ -114,6 +114,7 @@ class Reporter{
 		$html = $this->TEMPLATE_FILR_REPORT;
 		$allLines = count($arr)-2;
 		$excutableLines = 0;
+		var_dump($coverIndex);
 		$coverLines =count($coverIndex);
 
 		$str = '';
@@ -159,6 +160,8 @@ class Reporter{
 		else{
 			$result['coverage_rate'] = '0';
 		}
+
+
 		
 		return $result;
 	}

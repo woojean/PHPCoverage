@@ -120,5 +120,20 @@ Woojean\PHPCoverage\Injecter::Inject([
   extension = redis.so
   auto_prepend_file="/srv/http/header.php"
 ```
+
+* 配置apache
+```bash
+     AllowOverride None
+
+    #
+    # Controls who can get stuff from this server.
+    #
+    Require all granted
+
+    Php_value auto_prepend_file /srv/http/header.php
+</Directory>
+
+```
+
 * 参考博客
   https://testerhome.com/articles/20116

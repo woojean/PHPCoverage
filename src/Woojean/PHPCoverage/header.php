@@ -1,8 +1,8 @@
 <?php
-require_once 'Injecter.php';
+require_once '/home/hui/PHPCoverage/src/Woojean/PHPCoverage/Injecter.php';
 Woojean\PHPCoverage\Injecter::Inject([
-	'log_dir'=>'/srv/http/logs',
-	'ignore_file'=> 'example.ignore',
+	'log_dir'=>'/logs',
+	'ignore_file'=> '/home/hui/PHPCoverage/demo/example.ignore',
 	'is_repeat' => true
 ]);
 ?>

@@ -1,15 +1,15 @@
 <?php 
 
-/*require_once '/vagrant/www/github/PHPCoverage/src/Woojean/PHPCoverage/Injecter.php';
-Woojean\PHPCoverage\Injecter::Inject([
-	'log_dir'=>'/vagrant/logs/PHPCoverage',
-	'ignore_file'=>'/vagrant/www/github/PHPCoverage/demo/example.ignore',
-	'is_repeat' => true 
-]);*/
+//require_once '/home/yang/PhpstormProjects/PHPCoverage/src/Woojean/PHPCoverage/Injecter.php';
+//Woojean\PHPCoverage\Injecter::Inject([
+//	'log_dir'=>'/home/yang/PhpstormProjects/PHPCoverage/logs/',
+//	'ignore_file'=>'/home/yang/PhpstormProjects/PHPCoverage/demo/example.ignore',
+//	'is_repeat' => true
+//]);
 
-require_once '/vagrant/www/github/PHPCoverage/src/Woojean/PHPCoverage/Reporter.php';
-$reporter = new Woojean\PHPCoverage\Reporter('/vagrant/logs/PHPCoverage','/vagrant/www/github/PHPCoverage/demo/example.ignore',true);
-$reporter->report();
+//require_once '/home/yang/PhpstormProjects/PHPCoverage/src/Woojean/PHPCoverage/Reporter.php';
+//$reporter = new Woojean\PHPCoverage\Reporter('/home/yang/PhpstormProjects/PHPCoverage/logs/','/home/yang/PhpstormProjects/PHPCoverage/demo/example.ignore',true);
+//$reporter->report();
 
 class A{
 	private $_a = 0;

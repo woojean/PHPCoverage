@@ -1,6 +1,8 @@
 <?php
 namespace Woojean\PHPCoverage;
 
+use Redis;
+
 class Reporter{
 	private $logDir = '';
 	private $ignoreFile = '';
@@ -21,11 +23,12 @@ class Reporter{
 		}
 		return false;
 	}
-	
+
 
 	public function report(){
-		$allCoverageData = $this->mergeCoverages();
-		
+		#$allCoverageData = $this->mergeCoverages();
+		$allCoverageData = $this->mergeCoveragesUsingRedis();
+
 		$html = $this->TEMPLATE_REPORT;
 		$items = '';
 
@@ -48,6 +51,10 @@ class Reporter{
 
 			$ret = $this->parseSrcFile($reportPath,$file,$lines);
 
+			//print_r($file);
+			//print_r("\n");
+			//var_dump($ret);
+
 			$fileStyle = '';
 			$coverageRate = floatval($ret['coverage_rate']);
 			if($coverageRate <= 0.2){
@@ -66,7 +73,7 @@ class Reporter{
 				$fileStyle = 'coverage_1';
 			}
 
-			
+
 			$fileCoverage = strval($coverageRate*100).'% ('.$ret['lines_covered'].'/'.$ret['lines_excutable'].')';
 
 			$fileItem = str_replace('%FILE_PATH%',$reportPath,$fileItem);
@@ -86,17 +93,19 @@ class Reporter{
 		$html = str_replace('%FILE_ITEMS%', $items, $html);
 
 
-        $html = str_replace('%SUM_FILES%', $sumFiles, $html);
-        $html = str_replace('%SUM_LINES%', $sumLines, $html);
-        $html = str_replace('%SUM_EXCUTABLE%', $sumExcutable, $html);
-        $html = str_replace('%SUM_COVERED%', $sumCovered, $html);
-        $html = str_replace('%SUM_COVERRATE%', $sumCoverRate, $html);
+		$html = str_replace('%SUM_FILES%', $sumFiles, $html);
+		$html = str_replace('%SUM_LINES%', $sumLines, $html);
+		$html = str_replace('%SUM_EXCUTABLE%', $sumExcutable, $html);
+		$html = str_replace('%SUM_COVERED%', $sumCovered, $html);
+		$html = str_replace('%SUM_COVERRATE%', $sumCoverRate, $html);
 
 		file_put_contents($this->logDir.DIRECTORY_SEPARATOR.'index.html', $html);
+		date_default_timezone_set('PRC');
+		echo "<br>The reported is update at " . date('Y-m-d H:i:s');
 	}
 
 	protected function parseSrcFile($reportPath,$srcPath,$lines){
-		
+
 		$result = [
 			'lines_all' => 0,
 			'lines_excutable' => 0,
@@ -111,6 +120,7 @@ class Reporter{
 		$html = $this->TEMPLATE_FILR_REPORT;
 		$allLines = count($arr)-2;
 		$excutableLines = 0;
+		//var_dump($coverIndex);
 		$coverLines =count($coverIndex);
 
 		$str = '';
@@ -121,6 +131,7 @@ class Reporter{
 			$code = preg_replace('/\s+/','&nbsp;',$value);
 
 			if(!$this->is_line_excutable($value)){
+				//echo "this code: $value not excutable!!<br>";
 				if(in_array($key+1, $coverIndex)){
 					$coverLines -= 1; // !!!
 				}
@@ -156,32 +167,50 @@ class Reporter{
 		else{
 			$result['coverage_rate'] = '0';
 		}
-		
+
+
+
 		return $result;
 	}
 
 
 	private $docFlag = false;
 	public function is_line_excutable($line){
-		if($this->docFlag && empty(strstr($line,'*/'))){
-			return false;
-		}
 
-		if( !empty(strstr($line,'/*')) ){
-			$this->docFlag = true;
+
+		$line = trim($line);
+		if(strlen($line)<2){
 			return false;
 		}
-		if( !empty(strstr($line,'*/')) ){
+		$the_first_two_chars = substr($line , 0 , 2);
+		$the_last_two_chars = substr($line,-2);
+
+		//多行注释结束
+		if($this->docFlag && strcmp($the_last_two_chars,"*/") == 0){
 			$this->docFlag = false;
 			return false;
 		}
-		if( !empty(strstr($line,'//')) ){
-			return false;
+
+		if(!$this->docFlag){
+			//多行注释开始
+			if(strcmp($the_first_two_chars,"/*") == 0){
+				$this->docFlag = true;
+				//是一个/*...*/的内联注释
+				if(strcmp($the_last_two_chars,"*/") == 0){
+					$this->docFlag = false;
+				}
+				return false;
+			}
+			//单行注释
+			if(strcmp($the_first_two_chars,"//") == 0 || strcmp($the_first_two_chars,"#") == 0){
+				return false;
+			}
 		}
-		if(strlen(trim($line))<2){
-			return false;
-		}
+
 		return true;
+
+
+
 	}
 
 	protected function mergeCoverages(){
@@ -202,16 +231,33 @@ class Reporter{
 		return $allCoverageData;
 	}
 
+	protected function mergeCoveragesUsingRedis(){
+		$allCoverageData = [];
+		$redis = new Redis();
+		$redis->connect('127.0.0.1', 6379);
+		echo "Connection to server successfully...\n";
+		$fileNames = $redis->keys("*.php");
+		foreach ($fileNames as $filename){
+			$lines = $redis->sMembers($filename);
+			$tmp = [];
+			foreach ($lines as $lineNo){
+				$tmp[$lineNo] = 1;
+			}
+			$allCoverageData[$filename] = $tmp;
+		}
+		return $allCoverageData;
+	}
+
 	protected function getCoverageFiles(){
 		$files = [];
 		$dh = opendir($this->logDir);
-  		while ($file=readdir($dh)) {
-  			if('coverage' == pathinfo($file)['extension']){
-  				$files[] = $file;
-  			}
-    	}
-  		closedir($dh);
-  		return $files;
+		while ($file=readdir($dh)) {
+			if('coverage' == pathinfo($file)['extension']){
+				$files[] = $file;
+			}
+		}
+		closedir($dh);
+		return $files;
 	}
 
 
@@ -222,168 +268,168 @@ class Reporter{
 	private $TEMPLATE_NAV_ITEM = '<li><a href="%FILE_PATH%"><label>%FILE_NAME%</label><span class="%FILE_STYLE%">%FILE_COVERAGE%</span></a></li>';
 
 	private $TEMPLATE_REPORT = '<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>PHPCoverage Code Coverage Report</title>
-    <style>
-        html,body,div,span,iframe{
-            margin: 0;
-            padding: 0;
-        }
+		<html>
+		<head>
+		<meta charset="UTF-8">
+		<title>PHPCoverage Code Coverage Report</title>
+		<style>
+		html,body,div,span,iframe{
+		margin: 0;
+		padding: 0;
+}
 
-		html,body{
-			height: 100%;
-			font-size:0.8em;
-            font-family: "Microsoft YaHei" ! important;
-		}
-		
-		ul{  
-			list-style-type: none;  
-			margin:0;
-			padding:0;
-			float: left;
-            width: 100%;
-		}  
+html,body{
+height: 100%;
+font-size:0.8em;
+font-family: "Microsoft YaHei" ! important;
+}
 
-		li{
-			list-sytle-type:none;
-            height: 30px;
-            line-height: 30px;
-            background: #CCFFCC;
-			font-size:0.8em;
-			text-align:left;
-			border:1px solid white;
-			padding:0;
-        }
+ul{  
+list-style-type: none;  
+margin:0;
+padding:0;
+float: left;
+width: 100%;
+}  
 
-        .coverage_1{
-            background: #AAFFAA;
-        }
-        .coverage_2{
-            background: #B3EE3A;
-        }
-        .coverage_3{
-            background: #EEEE00;
-        }
-        .coverage_4{
-            background: #FFC125;
-        }
-        .coverage_5{
-            background: #F08080;
-        }
+li{
+list-sytle-type:none;
+height: 30px;
+line-height: 30px;
+background: #CCFFCC;
+font-size:0.8em;
+text-align:left;
+border:1px solid white;
+padding:0;
+}
 
-        li label{
-			width:70%;
-            float:left;
-			height: 30px;
-            cursor:pointer;
-        }
-		
-		li span{
-			width:25%;
-			height: 30px;
-            float:right;
-            text-align: right;
-        }
-		
-        .select{
-            border:3px solid red;
-        }
+.coverage_1{
+background: #AAFFAA;
+}
+.coverage_2{
+background: #B3EE3A;
+}
+.coverage_3{
+background: #EEEE00;
+}
+.coverage_4{
+background: #FFC125;
+}
+.coverage_5{
+background: #F08080;
+}
 
-        .sum{
-            position:fixed;
-            left:0;
-            top:0;
-            width: 100%;
-            height: 30px;
-            line-height: 30px;       
-            padding-left: 50px;
-            border:1px solid #eee;
-            background: #FFF68F;
-            
-        }
+li label{
+width:70%;
+float:left;
+height: 30px;
+cursor:pointer;
+}
 
-        .sum {
-           font-size: 0.8em; 
-        }
+li span{
+width:25%;
+height: 30px;
+float:right;
+text-align: right;
+}
 
-        .sum label{
+.select{
+border:3px solid red;
+}
 
-        }
+.sum{
+position:fixed;
+left:0;
+top:0;
+width: 100%;
+height: 30px;
+line-height: 30px;       
+padding-left: 50px;
+border:1px solid #eee;
+background: #FFF68F;
 
-        .sum span{
-            color: red;
-            margin-right: 50px;
-        }
+}
 
-        .sum a {
-            float: right;
-            margin-right: 100px;
-        }
+.sum {
+font-size: 0.8em; 
+}
+
+.sum label{
+
+}
+
+.sum span{
+color: red;
+margin-right: 50px;
+}
+
+.sum a {
+float: right;
+margin-right: 100px;
+}
 
 
-        .navgation{
-			margin-top: 30px;
-			border:1px solid #eee;
-			width:30%;
-            text-align: left;
-			padding:0;
-            overflow:auto;
-        }
-		
-        .filelist{
-            overflow:auto;
-        }
+.navgation{
+margin-top: 30px;
+border:1px solid #eee;
+width:30%;
+text-align: left;
+padding:0;
+overflow:auto;
+}
 
-        .con{
-            width: 100%;
-			height:100%;
-			float:right;
-        }
+.filelist{
+overflow:auto;
+}
 
-		.container{
-            position:fixed;
-            left:30%;
-            width:70%;
-            top:30px;
-			height:100%;
-		}
-    </style>
-</head>
-<body>
-    <div class="sum">
-        <label>执行总文件数：</label><span>%SUM_FILES%</span>
-        <label>代码总行数：</label><span>%SUM_LINES%</span>
-        <label>可执行代码行数：</label><span>%SUM_EXCUTABLE%</span>
-        <label>覆盖可执行代码行数：</label><span>%SUM_COVERED%</span>
-        <label>可执行代码覆盖率：</label><span>%SUM_COVERRATE%</span>
-        <a href="https://github.com/woojean/PHPCoverage">Generated by PHPCoverage</a>
-    </div>
-    <div class="navgation" id="navgation">
-        <div class="filelist">
-		<ul>
-			%FILE_ITEMS%
-		</ul>
-        </div>
-    </div>
-	<div class="container">
-		<iframe class="con" src="" frameborder="0" id="content"></iframe>
+.con{
+width: 100%;
+height:100%;
+float:right;
+}
+
+.container{
+position:fixed;
+left:30%;
+width:70%;
+top:30px;
+height:100%;
+}
+</style>
+	</head>
+	<body>
+	<div class="sum">
+	<label>执行总文件数：</label><span>%SUM_FILES%</span>
+	<label>代码总行数：</label><span>%SUM_LINES%</span>
+	<label>可执行代码行数：</label><span>%SUM_EXCUTABLE%</span>
+	<label>覆盖可执行代码行数：</label><span>%SUM_COVERED%</span>
+	<label>可执行代码覆盖率：</label><span>%SUM_COVERRATE%</span>
+	<a href="https://github.com/woojean/PHPCoverage">Generated by PHPCoverage</a>
 	</div>
-</body>
-<script>
-    var btns = document.getElementById("navgation").getElementsByTagName("a");
-    var tabCon = document.getElementById("content");
-    for (var i = 0; i < btns.length; i++) {
-        btns[i].onclick = function(){
-            for (var i = 0; i < btns.length; i++) {
-                btns[i].className = "";
-            };
-            this.className = "select";
-            tabCon.src = this.href;
-            return false;
-        }
-    };
+	<div class="navgation" id="navgation">
+	<div class="filelist">
+	<ul>
+	%FILE_ITEMS%
+	</ul>
+	</div>
+	</div>
+	<div class="container">
+	<iframe class="con" src="" frameborder="0" id="content"></iframe>
+	</div>
+	</body>
+	<script>
+var btns = document.getElementById("navgation").getElementsByTagName("a");
+var tabCon = document.getElementById("content");
+for (var i = 0; i < btns.length; i++) {
+	btns[i].onclick = function(){
+		for (var i = 0; i < btns.length; i++) {
+			btns[i].className = "";
+};
+this.className = "select";
+tabCon.src = this.href;
+return false;
+}
+};
 </script>
 </html>';
 

@@ -111,4 +111,33 @@ Woojean\PHPCoverage\Injecter::Inject([
 
 
 
+# 统计web服务的代码覆盖率(使用auto_prepend_file)
+```bash
+0.Test the network by 'ping www.baidu.com'
+	if it is timeout,please connect to school network.
+1.git clone https://github.com/czcq/PHPCoverage.git
+	if PHPCoverage directory exists，please rename it by 'mv PHPCoverage PHPCoverage.bk'
+2.chmod 777 -R PHPCoverage
+3.sudo apt-get install redis
+4.sudo apt-get install php-redis
+5.sudo vim /etc/php/7.4/apache2/php.ini
+	# add the follow lines:
+	xdebug.mode = coverage
+	extension = redis.so
+	auto_prepend_file="/home/hui/PHPCoverage/src/Woojean/PHPCoverage/header.php"
+6.sudo systemctl restart apache2
+7.sudo vim /var/www/html/wp/index.php # delete injected code
+8.create a file named phpinfo.php:
+	<?php
+		phpinfo();
+9.visit the sites:
+	# php configurations:
+	http://127.0.0.1:81/wp/phpinfo.php
+	# coverage data:
+	http://127.0.0.1:8000/index.html
+	# 初始数据
+	执行总文件数：3  代码总行数：112	可执行代码行数：72 覆盖可执行代码行数 3   可执行代码覆盖率 4.17%
+```
 
+* 参考博客
+  https://testerhome.com/articles/20116
